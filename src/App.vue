@@ -73,18 +73,26 @@ export default {
 
     filterData: function() {
       let f = this.createFilter(this.filterYear, this.filterGender);
-      let filteredGeodata = {"type" : "FeatureCollection", "features" : this.origGeodata["features"].filter(f) };
+      let filteredFeatures = this.origGeodata["features"].filter(f);
       let coordLookup = {};
-      for (let i = 0; i < filteredGeodata.features.length; i++) {
-        let coord = filteredGeodata.features[i].geometry.coordinates;
+      for (let i = 0; i < filteredFeatures.length; i++) {
+        let coord = filteredFeatures[i].geometry.coordinates;
         if (coord in coordLookup) {
-          coordLookup[coord].push(i);
+          coordLookup[coord]['properties'].push(filteredFeatures[i].properties);
         } else {
-          coordLookup[coord] = [i];
+          coordLookup[coord] = {'coordinates' : coord, 'properties' : [filteredFeatures[i].properties]};
         }
       }
-      filteredGeodata['coordLookup'] = coordLookup;
-      console.log(filteredGeodata);
+      let features = [];
+      for (let coord in coordLookup) {
+        features.push({'geometry': {'coordinates': coordLookup[coord]['coordinates']},
+          'properties': {'size': coordLookup[coord]['properties'].length,
+          'data': coordLookup[coord]['properties']}});
+      }
+      let filteredGeodata = {"type" : "FeatureCollection", "features" : features };
+
+      // filteredGeodata['coordLookup'] = coordLookup;
+      console.log("filteredGeodata",filteredGeodata);
       return filteredGeodata;
     }
   },
@@ -93,13 +101,10 @@ export default {
     var dataLoaded = data => {
       this.origGeodata = data;
 
-      // console.log(this.origGeodata);
+      console.log(this.origGeodata);
       // console.log(this.origGeodata.features[0].geometry.coordinates);
       // console.log(this.origGeodata.features[0].properties);
 
-
-
-      console.log(this.coordLookup);
       // https://docs.mapbox.com/help/tutorials/show-changes-over-time/#create-a-slider-bar
       this.map.on('load', () => {
         this.map.addSource('absconderData', {
@@ -174,10 +179,15 @@ export default {
           source: 'absconderData',
           paint: {
             'circle-color': '#25707f',
-            'circle-radius': 4,
+            'circle-radius': ['*', 2, ['number', ['get', 'size'], 10]],
+            'circle-opacity': 0.8,
             'circle-stroke-width': 1,
             'circle-stroke-color': '#fff'
           },
+        });
+
+        this.map.on('click', 'absconders', (e) => {
+          console.log(e.features[0].properties.data);
         });
 
 
