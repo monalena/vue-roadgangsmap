@@ -38,7 +38,6 @@ export default {
   },
   methods: {
     addMapLayers: function() {
-      this.map.on('styledata', () => {
         this.map.addSource('absconderData', {
           type: 'geojson',
           data: this.filterData(),
@@ -80,7 +79,6 @@ export default {
           }
         });
 
-
         this.map.on('click', 'absconders', (e) => {
           this.conInfo = JSON.parse(e.features[0].properties.data);
         });
@@ -93,20 +91,26 @@ export default {
           this.map.getCanvas().style.cursor = '';
         });
 
-      });
     },
 
     changeProjection: function(projection) {
-      this.map.removeLayer('absconders');
-      this.map.removeLayer('absconder-counts');
-      this.map.removeSource('absconderData');
+      console.log("change styledata");
+      if (this.map.getLayer('absconders')) {
+        this.map.removeLayer('absconders');
+      }
+      if (this.map.getLayer('absconder-counts')) {
+        this.map.removeLayer('absconder-counts');
+      }
+      if (this.map.getSource('absconderData')) {
+        this.map.removeSource('absconderData');
+      }
+
       if (projection == 'frank') {
         this.map.setStyle('mapbox://styles/monalena/ck93lkfz50h1g1ipiaut42uhw');
       } else {
         this.map.setStyle('mapbox://styles/mapbox/satellite-v9');
       }
 
-      this.addMapLayers();
     },
 
     createFilter: function(year, gender) {
@@ -171,62 +175,11 @@ export default {
     // load data
     var dataLoaded = data => {
       this.origGeodata = data;
-      // https://docs.mapbox.com/help/tutorials/show-changes-over-time/#create-a-slider-bar
       this.map.on('load', () => {
-        this.map.addSource('absconderData', {
-          type: 'geojson',
-          data: this.filterData(),
-          cluster: true,
-          clusterMaxZoom: 1, // Max zoom to cluster points on
-          clusterRadius: 50
-        });
-
-        this.map.addLayer({
-          id: 'absconders',
-          type: 'circle',
-          source: 'absconderData',
-          paint: {
-            'circle-color': '#25707f',
-            // 'circle-radius': ['*', 1, ['number', ['get', 'size'], 10]],
-            // 'circle-radius': ['get', 'size'],
-            'circle-radius':
-                    [
-                      'case',
-                      ['>=', ['number', ['get', 'size']], 10],
-                      ['get', 'size'],
-                      ['<', ['number', ['get', 'size']], 10],
-                      10,['get', 'size']
-                    ],
-            'circle-opacity': 0.8,
-            'circle-stroke-width': 1,
-            'circle-stroke-color': '#fff'
-          },
-        });
-
-        this.map.addLayer({
-          id:'absconder-counts',
-          type: 'symbol',
-          source: 'absconderData',
-          layout: {
-            'text-field': '{size}',
-            'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-            'text-size': 12
-          }
-        });
-
-
-        this.map.on('click', 'absconders', (e) => {
-          this.conInfo = JSON.parse(e.features[0].properties.data);
-        });
-
-        this.map.on('mouseenter', 'absconders', () => {
-          this.map.getCanvas().style.cursor = 'pointer';
-        });
-
-        this.map.on('mouseleave', 'absconders', () => {
-          this.map.getCanvas().style.cursor = '';
-        });
-
+        this.addMapLayers();
+      });
+      this.map.on('style.load', () => {
+        this.addMapLayers();
       });
     }
 
@@ -236,7 +189,7 @@ export default {
     this.map = new mapboxgl.Map({
       container: 'map', // container id
       style: 'mapbox://styles/monalena/ck93lkfz50h1g1ipiaut42uhw', // stylesheet location
-      // style: 'mapbox://styles/mapbox/satellite-v9',
+      // style: 'mapbox://styles/mapbox/satellite-v9',  // satellite projection from mapbox
       center: [147.242,-42.604], // starting position [lng, lat]
       zoom: 8 // starting zoom
     });
