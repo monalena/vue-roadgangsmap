@@ -28,11 +28,6 @@ export default {
       origGeodata:{},
       filterYear: 1835,
       filterGender: 0,
-      // Create a popup, but don't add it to the map yet.
-      popup: new mapboxgl.Popup({
-        closeButton: false,
-        closeOnClick: false
-      }),
       conInfo: [],
     }
   },
