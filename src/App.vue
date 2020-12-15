@@ -28,7 +28,9 @@ export default {
       origGeodata:{},
       filterYear: 1835,
       filterGender: 0,
-      conInfo: [],
+      conInfo: [{'Town': '',
+        'Accuracy': '',
+        'Provenance': ''}],
     }
   },
   methods: {
@@ -89,7 +91,6 @@ export default {
     },
 
     changeProjection: function(projection) {
-      console.log("change styledata");
       if (this.map.getLayer('absconders')) {
         this.map.removeLayer('absconders');
       }
@@ -169,7 +170,16 @@ export default {
   mounted() {
     // load data
     var dataLoaded = data => {
+
+      for (var i = 0; i < data.features.length; i++) {
+        data.features[i].properties.newDate = new Date(data.features[i].properties.Date);
+      }
+
+      // console.log(data.features[0].properties.newDate);
+      // console.log(data.features[0].properties.Date);
+
       this.origGeodata = data;
+
       this.map.on('load', () => {
         this.addMapLayers();
       });

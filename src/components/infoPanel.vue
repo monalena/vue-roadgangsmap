@@ -1,7 +1,14 @@
 <template>
     <div id="cards">
         <h1>{{info}}</h1>
-        <div v-for="(item,i) in conInfo" :key="i">
+        <div>
+            <div v-if="!!conInfo[0].Location"><b>Location</b>: {{conInfo[0].Location}}</div>
+            <div v-if="!!conInfo[0].Town"><b>Place</b>: {{conInfo[0].Town}}</div>
+            <div v-if="!!conInfo[0].Accuracy"><b>Accuracy</b>: {{conInfo[0].Accuracy}}</div>
+            <div v-if="!!conInfo[0].Provenance"><b>Provenance</b>: {{conInfo[0].Provenance}}</div>
+            <div> </div>
+        </div>
+        <div v-for="(item,i) in orderedConInfo" :key="i">
             <div class="card">
                 <div class="card-divider">
                     <p class="card-header">
@@ -10,14 +17,9 @@
                     </p>
                 </div>
                 <div class="card-section">
-                    <p>
-                        Date: {{item.Date}}
-                        <br>Description: {{item.Description}}
-                        <br>Master: {{item.MasterTitle}} {{item.MasterGiven}}  {{item.MasterFamily}} {{item.MasterSuffix}}
-                        <br>Place: {{item.Town}}
-                        <br>Accuracy: {{item.Accuracy}}
-                        <br>Provenance: {{item.Provenance}}
-                    </p>
+                    <div>Date: {{item.Date}}</div>
+                    <div>Description: {{item.Description}}</div>
+                    <div v-if="!!item.MasterFamily">Master: {{item.MasterTitle}} {{item.MasterGiven}}  {{item.MasterFamily}} {{item.MasterSuffix}}</div>
                 </div>
             </div>
         </div>
@@ -26,6 +28,7 @@
 </template>
 
 <script>
+    import _ from 'lodash';
     export default {
         name: "infoPanel",
         props:["conInfo"],
@@ -38,6 +41,14 @@
             // fillCards: function(conInfo) {
             //     console.log('Info:', conInfo);
             // }
+        },
+        computed: {
+            orderedConInfo: function () {
+                let sortedArray = _.orderBy(this.conInfo, function(dateObj) {
+                    return new Date(dateObj.newDate);
+                });
+                return sortedArray;
+            }
         }
     }
 </script>
