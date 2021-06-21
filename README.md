@@ -23,6 +23,27 @@ npm run serve
 npm run build
 ```
 
+### Deploy to Github-Pages
+After 'npm run build'  run
+```$xslt
+git add dist && git commit -m "New commit"
+```
+then
+```
+git subtree push --prefix dist origin gh-pages
+```
+should this not work (due to pull issues) run
+```
+npm run deploy-demo
+```
+instead. 
+
+For new deployment remember:
+
+* remove /dist from gitignore file
+* change vue.config.js to project name
+* when loading data get your paths right with process.env.BASE_URL
+
 ### Lints and fixes files
 ```
 npm run lint
