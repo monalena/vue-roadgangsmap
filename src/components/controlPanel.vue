@@ -1,10 +1,10 @@
 <template>
     <div id='console'>
         <h1>Absconder Map</h1>
-        <p>Absconding Events in Van Diemen's Land 1810-1860</p>
+        <Explanation></Explanation>
         <div class='session' id='sliderbar'>
             <h2>Year: <label id='active-year'>{{year}}</label></h2>
-            <input id='slider' class='row' type='range' min='1810' max='1860' step='1' v-model='year'
+            <input id='slider' class='row' type='range' min='1818' max='1860' step='1' v-model='year'
             @input="$emit('update',parseInt(year), selected)">
         </div>
         <div class='session'>
@@ -28,30 +28,35 @@
 
 
 <script>
-    export default {
-        name: "controlPanel",
-        data: function() {
-            return {
-                year: null,
-                selected: null,
-                projection: null,
-                filters: [
-                    {label: "All", choice: "all"},
-                    {label: "Female", choice: "female"},
-                    {label: "Male", choice: "male"}
-                ],
-                projections: [
-                    {label: "Frankland", choice: "frank"},
-                    {label: "Satellite", choice: "satellite"}
-                ]
-            }
-        },
-        mounted: function() {
-            this.year = 1835;
-            this.selected = "all";
-            this.projection = "frank";
+import Explanation from './Explanation.vue'
+
+export default {
+    name: "controlPanel",
+  components: {
+    Explanation
+  },
+    data: function() {
+        return {
+            year: null,
+            selected: null,
+            projection: null,
+            filters: [
+                {label: "All", choice: "all"},
+                {label: "Female", choice: "female"},
+                {label: "Male", choice: "male"}
+            ],
+            projections: [
+                {label: "Frankland", choice: "frank"},
+                {label: "Satellite", choice: "satellite"}
+            ]
         }
+    },
+    mounted: function() {
+        this.year = 1835;
+        this.selected = "all";
+        this.projection = "frank";
     }
+}
 </script>
 
 <style scoped>

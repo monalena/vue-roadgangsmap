@@ -14,12 +14,12 @@ import control from './components/controlPanel.vue';
 import info from './components/infoPanel.vue';
 
 
+
 export default {
   name: 'App',
   components: {
     control,
-    info,
-
+    info
   },
   data() {
     return {
@@ -28,9 +28,7 @@ export default {
       origGeodata:{},
       filterYear: 1835,
       filterGender: 0,
-      conInfo: [{'Town': '',
-        'Accuracy': '',
-        'Provenance': ''}],
+      conInfo: [{}],
     }
   },
   methods: {
@@ -48,7 +46,17 @@ export default {
           type: 'circle',
           source: 'absconderData',
           paint: {
-            'circle-color': '#25707f',
+            //'circle-color': '#25707f',
+            'circle-color': [
+              'match',
+              ['get', 'col'],
+              1,
+              '#fbb03b',
+              0,
+              '#223b53',
+              /* other */ '#ccc'
+            ],
+
             // 'circle-radius': ['*', 1, ['number', ['get', 'size'], 10]],
             // 'circle-radius': ['get', 'size'],
             'circle-radius':
@@ -133,13 +141,16 @@ export default {
         if (coord in coordLookup) {
           coordLookup[coord]['properties'].push(filteredFeatures[i].properties);
         } else {
-          coordLookup[coord] = {'coordinates' : coord, 'properties' : [filteredFeatures[i].properties]};
+          coordLookup[coord] = {'coordinates' : coord, 'properties' : [filteredFeatures[i].properties],
+            'col' : filteredFeatures[i].properties.government
+          };
         }
       }
       let features = [];
       for (let coord in coordLookup) {
         features.push({'geometry': {'coordinates': coordLookup[coord]['coordinates']},
           'properties': {'size': coordLookup[coord]['properties'].length,
+            'col': coordLookup[coord].col,
           'data': coordLookup[coord].properties}});
       }
       let filteredGeodata = {"type" : "FeatureCollection", "features" : features };
@@ -173,6 +184,12 @@ export default {
 
       for (var i = 0; i < data.features.length; i++) {
         data.features[i].properties.newDate = new Date(data.features[i].properties.Date);
+        if (data.features[i].properties.ConvictPlaceCode) {
+          // If true, add the 'government' property with value 1
+          data.features[i].properties.government = 1;
+        } else {
+          data.features[i].properties.government = 0;
+        }
       }
 
       // console.log(data.features[0].properties.newDate);
