@@ -16,11 +16,10 @@
         </div>
         <div v-for="(item,i) in orderedConInfo" :key="i">
             <div class="card">
-                <div class="card-divider">
-                    <p class="card-header">
-                        Name: {{item.Forename}} {{item.Surname}}
-
-                    </p>
+                <div @click="showAbscondingHistory(i)" class="card-divider">
+                  <p class="card-header">
+                      Name: {{item.Forename}} {{item.Surname}}
+                  </p>
                 </div>
                 <div class="card-section">
                   <div>Ship: {{item.Ship}}</div>
@@ -37,20 +36,39 @@
 <script>
     import _ from 'lodash';
 
+
     export default {
         name: "infoPanel",
-        props:["conInfo"],
+        props:["conInfo", "origGeoData"],
         data: function() {
             return {
               info: "Details",
               explain: "Get more details on individual abscondings by clicking on the circles in the map.",
-              hover: false,
+              hover: false
             }
         },
         methods: {
-            // fillCards: function(conInfo) {
-            //     console.log('Info:', conInfo);
-            // }
+            showAbscondingHistory: function (id) {
+              /*get the convict Id from the ordered Array number, then get a list of other abscondings from this convict*/
+              let convictid = this.orderedConInfo[id].ConvictId;
+              const filteredData = this.origGeoData.filter((item) => item['properties'].ConvictId === convictid);
+
+              const essentialInfo =  filteredData.map((item) => ({
+                year: item['properties'].YearAbsconded,
+                date: item['properties'].newDate,
+                description: item['properties'].Description,
+              }));
+
+/*              console.log(id);
+              console.log(convictid);
+              console.log(this.orderedConInfo[id].ConvictId);
+              console.log(essentialInfo);
+              this.absconderHist = essentialInfo;
+              console.log(this.absconderHist);*/
+              this.showHistory = true;
+              this.$emit('clicked', essentialInfo)
+              return essentialInfo;
+            }
         },
         computed: {
             orderedConInfo: function () {
@@ -66,34 +84,36 @@
 <style scoped>
 
     #cards {
-        position: absolute;
-        width: 240px;
-        margin-top: 380px;
-        margin-left: 10px;
-        padding: 10px 20px;
-        background-color: #fefcf6;
-        overflow-y: scroll;
-        max-height: 50%;
+      position: absolute;
+      width: 240px;
+      margin-top: 380px;
+      margin-left: 10px;
+      padding: 10px 20px;
+      background-color: #fefcf6;
+      overflow-y: scroll;
+      max-height: 50%;
     }
 
     .card{
-        background-color: gainsboro;
-        padding: 2px;
+      background-color: gainsboro;
+      padding: 2px;
+      font-size: 14px;
     }
 
     .card-header{
-        font-weight: bold;
+      font-weight: bold;
+      font-size: 16px;
     }
 
     h1 {
-        font-size: 20px;
-        line-height: 30px;
+      font-size: 20px;
+      line-height: 30px;
     }
 
     h2 {
-        font-size: 14px;
-        line-height: 20px;
-        margin-bottom: 10px;
+      font-size: 14px;
+      line-height: 20px;
+      margin-bottom: 10px;
     }
 
     a {
@@ -109,6 +129,21 @@
       display: block;
       visibility: visible;
       width: 190px;
+      padding: 1rem;
+      border: 1px solid #cacaca;
+      border-radius: 0;
+      background-color: #fefcf6;
+      font-size: 1rem;
+    }
+
+    .abscondingHist{
+      position: absolute;
+      z-index: 10;
+      top:50px;
+      right:50px;
+      display: block;
+      visibility: visible;
+      width: 100px;
       padding: 1rem;
       border: 1px solid #cacaca;
       border-radius: 0;

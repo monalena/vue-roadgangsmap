@@ -2,7 +2,8 @@
   <div id="app">
     <div id="map"></div>
     <control @update="update" @changeProjection="changeProjection"></control>
-    <info :conInfo="conInfo"></info>
+    <info :conInfo="conInfo" :orig-geo-data="origGeodata.features" @clicked="onClickChild"></info>
+    <AbscondingHist :absconding-history="absconderHistory" @clicked="closeComponent" v-if="showHistory"></AbscondingHist>
 
   </div>
 </template>
@@ -12,12 +13,16 @@ import * as d3 from 'd3';
 import mapboxgl from 'mapbox-gl';
 import control from './components/controlPanel.vue';
 import info from './components/infoPanel.vue';
+import AbscondingHist from "@/components/AbscondingHist.vue";
+
+
 
 
 
 export default {
   name: 'App',
   components: {
+    AbscondingHist,
     control,
     info
   },
@@ -29,9 +34,20 @@ export default {
       filterYear: 1835,
       filterGender: 0,
       conInfo: [{}],
+      absconderHistory: [{}],
+      showHistory: false
     }
   },
   methods: {
+    onClickChild (value) {
+      this.absconderHistory = value;
+      this.showHistory = true;
+      /*console.log(value) // someValue*/
+    },
+    closeComponent () {
+      this.showHistory = false;
+    },
+
     addMapLayers: function() {
         this.map.addSource('absconderData', {
           type: 'geojson',

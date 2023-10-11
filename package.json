@@ -13,7 +13,9 @@
     "foundation-sites": "^6.6.3",
     "lodash": "^4.17.20",
     "mapbox-gl": "^1.10.0",
-    "vue": "^2.6.11"
+    "vue": "^2.6.11",
+    "bootstrap": "^4.6.0",
+    "bootstrap-vue": "^2.21.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
