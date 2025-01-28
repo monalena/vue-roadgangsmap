@@ -2,7 +2,7 @@
 <template>
   <div>
     <button class="button float-right secondary small" type="button" @mouseover="showDropDown=true" @mouseout="showDropDown=false">
-      Background Information
+      Explanation
     </button>
     <transition name="bounce">
       <div v-if="showDropDown" class="dropdown-pane bottom" >{{information}}</div>
@@ -19,10 +19,7 @@
       data: function() {
         return {
           showDropDown: false,
-          information: 'The Absconder map is based on the Absconding notices published in the Hobart Town Gazette between 1818 and 1860. ' +
-              'Georeferencing has been done by Trudy  Cowley, ' +
-              'and includes references made by Richard Tuffin, as part  of the research project Landscapes of Production and Punishment. ' +
-              'The Absconder map has been created by Monika Schwarz as part of the ARC funded Conviction Politics Project.'
+          information: 'Visualised are assignments to Tasmanian road gangs, road stations, penal stations and similar between the years 1829-1839.'
         }
       },
       mounted: function() {
@@ -36,7 +33,7 @@
     .dropdown-pane{
         position: absolute;
         z-index: 10;
-        top:66px;
+        top:190px;
         right:-335px;
         display: block;
         visibility: visible;

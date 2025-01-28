@@ -1,28 +1,21 @@
 <template>
     <div id='console'>
-        <h1>Absconder Map</h1>
-        <Explanation></Explanation>
+      <h1>Van Diemen's Land</h1>
+      <h2>Road Gangs</h2>
+
         <div class='session' id='sliderbar'>
-            <h2>Year: <label id='active-year'>{{year}}</label></h2>
-            <input id='slider' class='row' type='range' min='1818' max='1860' step='1' v-model='year'
+            <h3>in the Year <label id='active-year'>{{year}}</label></h3>
+            <input id='slider' class='row' type='range' min='1829' max='1839' step='1' v-model='year'
             @input="$emit('update',parseInt(year), selected)">
         </div>
-        <div class='session'>
-            <h2>Gender</h2>
-            <div v-for="item in filters" :key="item.label">
-                <input :id='item.label' type='radio' v-model='selected' :value='item.choice'
-                @change="$emit('update', parseInt(year), selected)">
-                <label :for='item.label'>{{item.label}}</label>
-            </div>
-        </div>
-        <div class="'projection">
-            <h2>Projection</h2>
-            <div v-for="item in projections" :key="item.label">
-                <input :id="item.label" type="radio" v-model="projection" :value="item.choice"
-                @change="$emit('changeProjection', projection)">
-                <label :for="item.label">{{item.label}}</label>
-            </div>
-        </div>
+      <br>
+      <div>Use the slider to select a year.</div>
+
+      <br>
+      <div>
+        <Explanation></Explanation>
+      </div>
+
     </div>
 </template>
 
@@ -40,19 +33,13 @@ export default {
             year: null,
             selected: null,
             projection: null,
-            filters: [
-                {label: "All", choice: "all"},
-                {label: "Female", choice: "female"},
-                {label: "Male", choice: "male"}
-            ],
             projections: [
-                {label: "Frankland", choice: "frank"},
-                {label: "Satellite", choice: "satellite"}
+                {label: "Frankland", choice: "frank"}
             ]
         }
     },
     mounted: function() {
-        this.year = 1835;
+        this.year = 1829;
         this.selected = "all";
         this.projection = "frank";
     }
@@ -69,14 +56,21 @@ export default {
     }
 
     h1 {
-        font-size: 20px;
-        line-height: 30px;
+        font-size: 26px;
+        line-height: 28px;
+        margin-bottom: 10px;
     }
 
     h2 {
-        font-size: 14px;
-        line-height: 20px;
-        margin-bottom: 10px;
+        font-size:30px;
+        line-height: 30px;
+
+    }
+
+    h3 {
+      font-size: 18px;
+      line-height: 20px;
+
     }
 
     a {

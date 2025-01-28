@@ -1,9 +1,8 @@
 <template>
   <div id="app">
     <div id="map"></div>
-    <control @update="update" @changeProjection="changeProjection"></control>
-    <info :conInfo="conInfo" :orig-geo-data="origGeodata.features" @clicked="onClickChild"></info>
-    <AbscondingHist :absconding-history="absconderHistory" @clicked="closeComponent" v-if="showHistory"></AbscondingHist>
+    <control @update="update" ></control>
+    <info :info="info" :orig-geo-data="origGeodata.features"></info>
 
   </div>
 </template>
@@ -13,7 +12,6 @@ import * as d3 from 'd3';
 import mapboxgl from 'mapbox-gl';
 import control from './components/controlPanel.vue';
 import info from './components/infoPanel.vue';
-import AbscondingHist from "@/components/AbscondingHist.vue";
 
 
 
@@ -22,7 +20,6 @@ import AbscondingHist from "@/components/AbscondingHist.vue";
 export default {
   name: 'App',
   components: {
-    AbscondingHist,
     control,
     info
   },
@@ -31,25 +28,14 @@ export default {
       map: null,
       accessToken: 'pk.eyJ1IjoibW9uYWxlbmEiLCJhIjoiY2l6dzFuenBzMDFvYjMyazdhcWMwd2dsMCJ9.xlKLbnrGSgAjxHLOM6JbVw',
       origGeodata:{},
-      filterYear: 1835,
-      filterGender: 0,
-      conInfo: [{}],
-      absconderHistory: [{}],
-      showHistory: false
+      filterYear: 1829,
+      info: [{}]
     }
   },
   methods: {
-    onClickChild (value) {
-      this.absconderHistory = value;
-      this.showHistory = true;
-      /*console.log(value) // someValue*/
-    },
-    closeComponent () {
-      this.showHistory = false;
-    },
 
     addMapLayers: function() {
-        this.map.addSource('absconderData', {
+        this.map.addSource('gangsData', {
           type: 'geojson',
           data: this.filterData(),
           cluster: true,
@@ -58,30 +44,30 @@ export default {
         });
 
         this.map.addLayer({
-          id: 'absconders',
+          id: 'gangs',
           type: 'circle',
-          source: 'absconderData',
+          source: 'gangsData',
           paint: {
-            //'circle-color': '#25707f',
-            'circle-color': [
-              'match',
-              ['get', 'col'],
-              1,
-              '#fbb03b',
-              0,
-              '#223b53',
-              /* other */ '#ccc'
-            ],
+            'circle-color': '#25707f',
+            //'circle-color': [
+            //  'match',
+            //  ['get', 'col'],
+            //  1,
+            //  '#fbb03b',
+            //  0,
+            //  '#223b53',
+            //  /* other */ '#ccc'
+            //],
 
-            // 'circle-radius': ['*', 1, ['number', ['get', 'size'], 10]],
-            // 'circle-radius': ['get', 'size'],
+            //'circle-radius': ['*', 1, ['number', ['get', 'size'], 10]],
+            //'circle-radius': ['get', 'size'],
             'circle-radius':
                     [
                       'case',
                       ['>=', ['number', ['get', 'size']], 10],
-                      ['get', 'size'],
+                      ['get', 'circlesize'],
                       ['<', ['number', ['get', 'size']], 10],
-                      10,['get', 'size']
+                      10,['get', 'circlesize']
                     ],
             'circle-opacity': 0.8,
             'circle-stroke-width': 1,
@@ -92,7 +78,7 @@ export default {
         this.map.addLayer({
           id:'absconder-counts',
           type: 'symbol',
-          source: 'absconderData',
+          source: 'gangsData',
           layout: {
             'text-field': '{size}',
             'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
@@ -100,116 +86,73 @@ export default {
           }
         });
 
-        this.map.on('click', 'absconders', (e) => {
-          this.conInfo = JSON.parse(e.features[0].properties.data);
+        this.map.on('click', 'gangs', (e) => {
+          this.info = JSON.parse(e.features[0].properties.data);
         });
 
-        this.map.on('mouseenter', 'absconders', () => {
+        this.map.on('mouseenter', 'gangs', () => {
           this.map.getCanvas().style.cursor = 'pointer';
         });
 
-        this.map.on('mouseleave', 'absconders', () => {
+        this.map.on('mouseleave', 'gangs', () => {
           this.map.getCanvas().style.cursor = '';
         });
 
     },
 
-    changeProjection: function(projection) {
-      if (this.map.getLayer('absconders')) {
-        this.map.removeLayer('absconders');
-      }
-      if (this.map.getLayer('absconder-counts')) {
-        this.map.removeLayer('absconder-counts');
-      }
-      if (this.map.getSource('absconderData')) {
-        this.map.removeSource('absconderData');
-      }
+    createFilter: function(year) {
 
-      if (projection == 'frank') {
-        this.map.setStyle('mapbox://styles/monalena/ck93lkfz50h1g1ipiaut42uhw');
-      } else {
-        this.map.setStyle('mapbox://styles/mapbox/satellite-v9');
-      }
-
-    },
-
-    createFilter: function(year, gender) {
-      if (gender > 0) {
         return function (f) {
           return "properties" in f &&
-                  'YearAbsconded' in f['properties'] && f['properties']['YearAbsconded'] === year &&
-                  'Gender' in f['properties'] && f['properties']['Gender'] == gender;
-        }
-      } else {
-        return function (f) {
-          return "properties" in f &&
-                  'YearAbsconded' in f['properties'] && f['properties']['YearAbsconded'] === year;
-        }
+                  'Year' in f['properties'] && f['properties']['Year'] === year;
       }
     },
 
     filterData: function() {
-      let f = this.createFilter(this.filterYear, this.filterGender);
+      let f = this.createFilter(this.filterYear);
       let filteredFeatures = this.origGeodata["features"].filter(f);
+      console.log("filteredFeatures",filteredFeatures);
       let coordLookup = {};
       for (let i = 0; i < filteredFeatures.length; i++) {
         let coord = filteredFeatures[i].geometry.coordinates;
         if (coord in coordLookup) {
           coordLookup[coord]['properties'].push(filteredFeatures[i].properties);
         } else {
-          coordLookup[coord] = {'coordinates' : coord, 'properties' : [filteredFeatures[i].properties],
-            'col' : filteredFeatures[i].properties.government
+          coordLookup[coord] = {
+            'coordinates': coord, 'properties': [filteredFeatures[i].properties],
+            'col': filteredFeatures[i].properties.government
           };
         }
       }
+      console.log("coordLookup",coordLookup);
       let features = [];
       for (let coord in coordLookup) {
         features.push({'geometry': {'coordinates': coordLookup[coord]['coordinates']},
-          'properties': {'size': coordLookup[coord]['properties'].length,
-            'col': coordLookup[coord].col,
+          'properties': {'size': coordLookup[coord].properties[0]['Assigned'],
+            'circlesize': Math.log(coordLookup[coord].properties[0]['Assigned'])*20,
+          //'size': coordLookup[coord]['properties'].length,
           'data': coordLookup[coord].properties}});
       }
+      console.log("features",features);
       let filteredGeodata = {"type" : "FeatureCollection", "features" : features };
-      // console.log("filteredGeodata",filteredGeodata);
+
+      console.log("filteredGeodata",filteredGeodata);
       return filteredGeodata;
     },
 
-    update: function(year, selected) {
+    update: function(year) {
       // update the map filter
       // Year
       this.filterYear = year;
-      // Gender
-      if (selected === 'all') {
-        // `null` would not work for combining filters
-        this.filterGender = 0;
-      } else if (selected === 'female') {
-        this.filterGender = 2;
-      } else if (selected === 'male') {
-        this.filterGender = 1;
-      } else {
-        console.log('error');
-      }
+
       // Update map
-      this.map.getSource('absconderData').setData(this.filterData());
+      this.map.getSource('gangsData').setData(this.filterData());
 
     }
   },
   mounted() {
     // load data
-    var dataLoaded = data => {
-
-      for (var i = 0; i < data.features.length; i++) {
-        data.features[i].properties.newDate = new Date(data.features[i].properties.Date);
-        if (data.features[i].properties.ConvictPlaceCode) {
-          // If true, add the 'government' property with value 1
-          data.features[i].properties.government = 1;
-        } else {
-          data.features[i].properties.government = 0;
-        }
-      }
-
-      // console.log(data.features[0].properties.newDate);
-      // console.log(data.features[0].properties.Date);
+    let dataLoaded = data => {
 
       this.origGeodata = data;
 
@@ -219,6 +162,7 @@ export default {
       this.map.on('style.load', () => {
         this.addMapLayers();
       });
+      //console.log("origGeodata",this.origGeodata);
     }
 
     // load map
@@ -243,7 +187,7 @@ export default {
   body {
     margin: 0;
     padding: 0;
-    font-family: 'Helvetica Neue', Helvetica, Arial, Sans-serif;
+    font-family: 'Helvetica Neue', Helvetica, Arial, Sans-serif,serif;
   }
 
   #map {
@@ -254,7 +198,7 @@ export default {
   }
 
   h1 {
-    font-size: 20px;
+    font-size: 30px;
     line-height: 30px;
   }
 
