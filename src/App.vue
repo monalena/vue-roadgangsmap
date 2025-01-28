@@ -129,7 +129,7 @@ export default {
       for (let coord in coordLookup) {
         features.push({'geometry': {'coordinates': coordLookup[coord]['coordinates']},
           'properties': {'size': coordLookup[coord].properties[0]['Assigned'],
-            'circlesize': Math.log(coordLookup[coord].properties[0]['Assigned'])*20,
+            'circlesize': Math.sqrt(coordLookup[coord].properties[0]['Assigned'])*6,
           //'size': coordLookup[coord]['properties'].length,
           'data': coordLookup[coord].properties}});
       }
