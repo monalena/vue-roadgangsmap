@@ -1,8 +1,8 @@
 # Vue - Road Gangs Map
 
-A visualisation of absconding convicts in Van Diemen's Land between 1810-1860. 
-Filter per years and genders. Change between the recreated Frankland map from 1839 showing historical County, Hundred and Parish names and a satellite projection. 
-Click on the circles to find more information on the individual absconding events (Convict name, date...) Visualisation created using Vue.js and Mapbox. 
+A visualisation of assignments of convicts to road gangs, road stations and penal stations in Van Diemen's Land between 1829-1839. 
+Filter per years and click on circles for more detail. Background is the recreated Frankland map from 1839 showing historical County, Hundred and Parish names. 
+Visualisation created using Vue.js and Mapbox. Data collected from the convict records transcribed by volunteers through DHT (Digital History Tasmania).
 
 #### Try it out here:
 
