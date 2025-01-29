@@ -48,7 +48,8 @@ export default {
           type: 'circle',
           source: 'gangsData',
           paint: {
-            'circle-color': '#25707f',
+            'circle-color': '#1B4F72',
+            //'circle-color': '#25707f',
             //'circle-color': [
             //  'match',
             //  ['get', 'col'],
@@ -172,7 +173,7 @@ export default {
       container: 'map', // container id
       style: 'mapbox://styles/monalena/ck93lkfz50h1g1ipiaut42uhw', // stylesheet location
       // style: 'mapbox://styles/mapbox/satellite-v9',  // satellite projection from mapbox
-      center: [147.242,-42.604], // starting position [lng, lat]
+      center: [146.642,-42.204], // starting position [lng, lat]
       zoom: 8 // starting zoom
     });
 

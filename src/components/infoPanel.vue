@@ -1,10 +1,13 @@
 <template>
     <div id="cards">
         <div>
-          <div><b>Government Location</b>: {{info[0].Place}} {{info[0].cleanProperty}}</div>
+          <div><h1>Details</h1></div>
+          <div>Click on a circle for more.</div>
+          <br>
+          <div><b>Location</b>: {{info[0].Place}} {{info[0].cleanProperty}}</div>
           <div v-if="!!info[0].District"><b>District</b>: {{info[0].District}}</div>
           <div v-if="!!info[0].County"><b>County</b>: {{info[0].County}}</div>
-          <div><b>Assigned</b>: {{info[0].Assigned}}</div>
+          <div><b>Assigned Convicts</b>: {{info[0].Assigned}}</div>
         </div>
     </div>
 
